@@ -4,6 +4,7 @@ using UnityEngine;
 using Photon.Pun;
 using TMPro;
 using Photon.Realtime;
+using UnityEngine.SceneManagement;
 
 public class Laucher : MonoBehaviourPunCallbacks
 {
@@ -24,6 +25,7 @@ public class Laucher : MonoBehaviourPunCallbacks
 
     [Header("[Room Info]")]
     public GameObject roomPanel;
+    public GameObject startButton;
     public TMP_Text roomNameText;
     public TMP_Text playerNicknameText;
 
@@ -38,7 +40,7 @@ public class Laucher : MonoBehaviourPunCallbacks
     [Header("[Create Nickname]")]
     public GameObject nicknamePanel;                        // 닉네임 생성 오브젝트
     public TMP_InputField nicknameInput;                    // 닉네임을 작성하는 공간
-    private bool hasSetNickname = false;                     // 닉네임이 저장이 되어 있으면 반복을 피해주기 위한 변수
+    private bool hasSetNickname = false;                    // 닉네임이 저장이 되어 있으면 반복을 피해주기 위한 변수
     private const string PLAYERNAMEKEY = "playerName";      // playerPrefabs 를 사용, 간단한 데이터 저장 방식
 
     [Header("[Photon RoomInfo]")]
@@ -46,6 +48,11 @@ public class Laucher : MonoBehaviourPunCallbacks
     public RoomButtonInfo theRoomButtonInfo;
     private List<RoomButtonInfo> roomButtonList = new List<RoomButtonInfo>();
     private List<TMP_Text> allPlayerName = new List<TMP_Text>();
+
+    [Header("[Photon Chat]")]
+    public TMP_Text[] chatText;
+    public TMP_InputField chatInput;
+    public PhotonView pV;
 
     private void Awake()
     {
@@ -57,7 +64,7 @@ public class Laucher : MonoBehaviourPunCallbacks
         SetResolution();
     }
 
-    private void SetResolution() => Screen.SetResolution(1920, 1080, false);
+    private void SetResolution() => Screen.SetResolution(1920/2, 1080/2, false);
 
     private void Start()
     {
@@ -186,7 +193,32 @@ public class Laucher : MonoBehaviourPunCallbacks
         roomNameText.text = $"방 제목 : {PhotonNetwork.CurrentRoom.Name}";
         roomPanel.SetActive(true);
 
-        playerNicknameText.text = PhotonNetwork.NickName;
+        ShowListAllPlayer();
+        ChatClear();
+
+        if (PhotonNetwork.IsMasterClient)
+        {
+            startButton.SetActive(true);
+        }
+        else
+        {
+            startButton.SetActive(false);
+        }
+    }
+
+    public override void OnMasterClientSwitched(Player newMasterClient)
+    {
+        if (PhotonNetwork.IsMasterClient)
+        {
+            if (PhotonNetwork.IsMasterClient)
+            {
+                startButton.SetActive(true);
+            }
+            else
+            { 
+                startButton.SetActive(false); 
+            }
+        }
     }
 
     public void JoinRoom(RoomInfo info)
@@ -202,9 +234,10 @@ public class Laucher : MonoBehaviourPunCallbacks
     {
         foreach (var player in allPlayerName)
         {
-            Destroy(player);
+            Destroy(player.gameObject);
         }
         allPlayerName.Clear();
+        playerNicknameText.gameObject.SetActive(false);
         Player[] players = PhotonNetwork.PlayerList;
         for (int i = 0; i < players.Length; i++)
         {
@@ -224,11 +257,13 @@ public class Laucher : MonoBehaviourPunCallbacks
         newPlayerNickname.gameObject.SetActive(true);
 
         allPlayerName.Add(newPlayerNickname);
+        pV.RPC(nameof(ChatRPC), RpcTarget.All, $"<color=blue>{newPlayer.NickName}</color>님이 방에 들어오셨습니다.");
     }
 
     public override void OnPlayerLeftRoom(Player otherPlayer)
     {
         ShowListAllPlayer();
+        pV.RPC(nameof(ChatRPC), RpcTarget.All, $"<color=red>{otherPlayer.NickName}</color>님이 방에 나가셨습니다.");
     }
 
     public void ButtonLeaveRoom()
@@ -251,6 +286,7 @@ public class Laucher : MonoBehaviourPunCallbacks
             Destroy(roomButton.gameObject);
         }
         roomButtonList.Clear();
+        theRoomButtonInfo.gameObject.SetActive(false);
 
         for (int i = 0; i < roomList.Count; i++)
         {
@@ -288,6 +324,10 @@ public class Laucher : MonoBehaviourPunCallbacks
     }
 
     #region Button
+    public void ButtonStartGame()
+    {
+        SceneManager.LoadScene("Photon MainGame");
+    }
 
     public void ButtonJoinRandomRoom()
     {
@@ -328,5 +368,49 @@ public class Laucher : MonoBehaviourPunCallbacks
         }
     }
 
+    #endregion
+    #region Photon Chat
+    private void ChatClear()
+    {
+        // 방에 들어갔을 때 채팅 창 로그가 비어있는 상태로 접속
+        chatInput.text = string.Empty;
+
+        for (int i = 0; i < chatText.Length; i++)
+        {
+            chatText[i].text = string.Empty;
+        }
+    }
+
+    public void Send()
+    {
+        string message = $"{PhotonNetwork.NickName} : {chatInput.text}";
+        pV.RPC(nameof(ChatRPC), RpcTarget.All, message);
+
+        chatInput.text = string.Empty;
+    }
+
+    [PunRPC]
+    private void ChatRPC(string message)    // 함수에 RPC를 작성하면 RPC 애트리뷰트를 사용하겠다는 약속이다.
+    {
+        bool isChatFull = false;
+
+        for (int i = 0; i < chatText.Length; i++)
+        {
+            if (chatText[i].text == string.Empty)
+            {
+                chatText[i].text = message;
+                isChatFull = true;
+                break;
+            }
+        }
+        if(!isChatFull)
+        {
+            for(int i = 1; i<chatText.Length; i++)
+            {
+                chatText[i - 1].text = chatText[i].text;
+            }
+            chatText[chatText.Length - 1].text = message;
+        }
+    }
     #endregion
 }

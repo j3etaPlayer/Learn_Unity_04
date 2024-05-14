@@ -12,7 +12,7 @@ public class RoomButtonInfo : MonoBehaviour
     {
         info = inputInfo;
 
-        buttonText.text = info.Name + info.PlayerCount;
+        buttonText.text = $"{info.Name}({info.PlayerCount})";
     }
     public void ButtonOpenRoom()
     {
