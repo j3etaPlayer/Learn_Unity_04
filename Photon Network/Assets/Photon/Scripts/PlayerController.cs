@@ -31,7 +31,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
 
     [Header("[Photon Component]")]
     PhotonView pV;
-    public GameObject forward;
+    public GameObject hiddenObject;                 // 1인칭 시점에서 숨기고 싶은 오브젝트
 
     private void Awake()
     {
@@ -49,7 +49,10 @@ public class PlayerController : MonoBehaviourPunCallbacks
         if (!pV.IsMine)
         {
             cam.gameObject.SetActive(false);
-            forward.layer = 0;
+            if (hiddenObject != null)
+            {
+                hiddenObject.layer = 0;
+            }
         }
     }
 
@@ -69,9 +72,18 @@ public class PlayerController : MonoBehaviourPunCallbacks
             // 플레이어의 인풋
             HandleInput();
             HandleView();
+            
+            PlayerAttack();
+        }
+    }
+
+    private void FixedUpdate()
+    {
+        if(pV.IsMine)
+        {
             // rigidbody
-            LimitSpeed();
             Move();
+            LimitSpeed();
         }
     }
 
@@ -150,7 +162,26 @@ public class PlayerController : MonoBehaviourPunCallbacks
 
     private void OnDrawGizmos()
     {
-        Gizmos.color = Color.yellow;
-        Gizmos.DrawLine(transform.position, -transform.up * groundCheckDistance);
+        Gizmos.color = Color.red;
+        Gizmos.DrawLine(transform.position, transform.position + (-transform.up * groundCheckDistance));
     }
+
+    #region Player Attack
+
+    private void PlayerAttack()
+    {
+        Shoot();
+    }
+
+    private void Shoot()
+    {
+        if(Input.GetMouseButtonDown(0))
+        {
+            Physics.Raycast(cam.transform.position, cam.transform.forward, out RaycastHit hit, 100f);
+
+            Debug.Log($"충돌한 오브젝트의 이름 : {hit.collider.gameObject.name}");
+        }
+    }
+
+    #endregion
 }
