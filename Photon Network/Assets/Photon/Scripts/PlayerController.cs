@@ -2,6 +2,7 @@ using Photon.Pun;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using Unity.VisualScripting.FullSerializer;
 using UnityEngine;
 
@@ -59,7 +60,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
     // Start is called before the first frame update
     void Start()
     {
-        
+        InitalizedAttackInfo();
     }
 
     // Update is called once per frame
@@ -72,14 +73,14 @@ public class PlayerController : MonoBehaviourPunCallbacks
             // 플레이어의 인풋
             HandleInput();
             HandleView();
-            
+
             PlayerAttack();
         }
     }
 
     private void FixedUpdate()
     {
-        if(pV.IsMine)
+        if (pV.IsMine)
         {
             // rigidbody
             Move();
@@ -128,7 +129,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
         // Rigidbody.Velocity는 현재 이동방향과 속도를 즉각적으로 반영하여 비현실적인 움직임으로 보일수 있다
         Vector3 currentSpeed = new Vector3(rigidbody.velocity.x, 0, rigidbody.velocity.z);
 
-        if(currentSpeed.magnitude > moveSpeed)
+        if (currentSpeed.magnitude > moveSpeed)
         {
             Vector3 limitSpeed = currentSpeed.normalized * moveSpeed;
             rigidbody.velocity = new Vector3(limitSpeed.x, rigidbody.velocity.y, limitSpeed.z);
@@ -160,28 +161,59 @@ public class PlayerController : MonoBehaviourPunCallbacks
         isGrounded = Physics.Raycast(transform.position, -transform.up, groundCheckDistance, groundLayer);
     }
 
-    private void OnDrawGizmos()
-    {
-        Gizmos.color = Color.red;
-        Gizmos.DrawLine(transform.position, transform.position + (-transform.up * groundCheckDistance));
-    }
-
     #region Player Attack
+    public GameObject bulletImpact;
+    public float shootDistance = 10f;
+    public float fireCoolTime = 0.1f;
+    private float fireCounter;
 
     private void PlayerAttack()
     {
-        Shoot();
+        InputAttack();
+    }
+
+    private void InputAttack()
+    {
+        fireCounter -= Time.deltaTime;
+
+        if (Input.GetMouseButtonDown(0))
+        {
+            if (fireCounter <= 0)
+            {
+                Shoot();
+            }
+        }
+    }
+
+    private void InitalizedAttackInfo()
+    {
+        fireCounter = fireCoolTime;
     }
 
     private void Shoot()
     {
-        if(Input.GetMouseButtonDown(0))
+        if (Physics.Raycast(cam.transform.position, cam.transform.forward, out RaycastHit hit, shootDistance))
         {
-            Physics.Raycast(cam.transform.position, cam.transform.forward, out RaycastHit hit, 100f);
+            GameObject bulletObj = Instantiate(bulletImpact, hit.point+(hit.normal * 0.002f), Quaternion.LookRotation(hit.normal, Vector3.up));
 
-            Debug.Log($"충돌한 오브젝트의 이름 : {hit.collider.gameObject.name}");
+            Destroy(bulletObj, 1f);
         }
-    }
+        
+        Debug.Log($"충돌한 오브젝트의 이름 : {hit.collider.gameObject.name}");
+        Debug.Log($"충돌한 오브젝트의 vector3 : {hit.point}");
+        Debug.Log($"충돌한 오브젝트의 거리 : {hit.distance}");
+        Debug.Log($"충돌한 오브젝트의 법선 : {hit.normal}");
 
+        fireCounter = fireCoolTime;
+    }
     #endregion
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawLine(transform.position, transform.position + (-transform.up * groundCheckDistance));
+
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawLine(cam.transform.position, cam.transform.forward * shootDistance);
+    }
 }
