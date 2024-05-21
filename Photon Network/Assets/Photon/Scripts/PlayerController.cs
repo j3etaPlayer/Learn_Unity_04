@@ -166,16 +166,48 @@ public class PlayerController : MonoBehaviourPunCallbacks
     public float shootDistance = 10f;
     public float fireCoolTime = 0.1f;
     private float fireCounter;
+    public bool isAutomatic;
+
+    public Gun[] allGuns;
+    private int currentGunIndex = 0;
+    private MuzzleFlash currentMuzzle;
 
     private void PlayerAttack()
     {
+        CoolDownFunction();
+        SelectGun();
         InputAttack();
+    }
+
+    private void SelectGun()
+    {
+        if (Input.GetAxisRaw("Mouse ScrollWheel") > 0)
+        {
+            currentGunIndex++;
+
+            if (allGuns.Length >= currentGunIndex)
+                currentGunIndex = 0;
+
+            SwitchGun();
+        }
+        else if (Input.GetAxisRaw("Mouse ScrollWheel") > 0)
+        {
+            currentGunIndex--;
+            if(allGuns.Length < 0)
+                currentGunIndex = allGuns.Length - 1;
+
+            SwitchGun();
+        }
+    }
+
+
+    private void CoolDownFunction()
+    {
+        fireCounter -= Time.deltaTime;
     }
 
     private void InputAttack()
     {
-        fireCounter -= Time.deltaTime;
-
         if (Input.GetMouseButtonDown(0))
         {
             if (fireCounter <= 0)
@@ -187,7 +219,12 @@ public class PlayerController : MonoBehaviourPunCallbacks
 
     private void InitalizedAttackInfo()
     {
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+
         fireCounter = fireCoolTime;
+        currentGunIndex = 0;
+        SwitchGun();
     }
 
     private void Shoot()
@@ -196,15 +233,37 @@ public class PlayerController : MonoBehaviourPunCallbacks
         {
             GameObject bulletObj = Instantiate(bulletImpact, hit.point+(hit.normal * 0.002f), Quaternion.LookRotation(hit.normal, Vector3.up));
 
+            currentMuzzle.gameObject.SetActive(true);
+
             Destroy(bulletObj, 1f);
         }
         
-        Debug.Log($"충돌한 오브젝트의 이름 : {hit.collider.gameObject.name}");
+        // Debug.Log($"충돌한 오브젝트의 이름 : {hit.collider.gameObject.name}");
         Debug.Log($"충돌한 오브젝트의 vector3 : {hit.point}");
         Debug.Log($"충돌한 오브젝트의 거리 : {hit.distance}");
         Debug.Log($"충돌한 오브젝트의 법선 : {hit.normal}");
 
         fireCounter = fireCoolTime;
+    }
+
+    private void SwitchGun()
+    {
+        foreach (var gun in allGuns)
+        {
+            gun.gameObject.SetActive(false);
+        }
+        allGuns[currentGunIndex].gameObject.SetActive(true);
+
+        SetGunAttribute(allGuns[currentGunIndex]);
+    }
+
+    private void SetGunAttribute(Gun gun)
+    {
+        fireCoolTime = gun.fireCoolTime;
+
+        isAutomatic = gun.isAutomatic;
+        currentMuzzle = gun.MuzzleFlash.GetComponent<MuzzleFlash>();
+
     }
     #endregion
 
