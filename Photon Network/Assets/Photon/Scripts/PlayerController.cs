@@ -168,9 +168,16 @@ public class PlayerController : MonoBehaviourPunCallbacks
     private float fireCounter;
     public bool isAutomatic;
 
+    [Header("[Overheat System]")]
+    public float maxHeat = 10f, heatCount, heatPerShot;
+    public float coolRate, overHeatCoolRate;
+    private bool overHeated = false;
+
     public Gun[] allGuns;
     private int currentGunIndex = 0;
     private MuzzleFlash currentMuzzle;
+
+    public PlayerUI playerUI;
 
     private void PlayerAttack()
     {
@@ -185,30 +192,80 @@ public class PlayerController : MonoBehaviourPunCallbacks
         {
             currentGunIndex++;
 
-            if (allGuns.Length >= currentGunIndex)
+            if (allGuns.Length - 1 < currentGunIndex)
                 currentGunIndex = 0;
 
             SwitchGun();
+            playerUI.SetWeaponSlot(currentGunIndex);
         }
-        else if (Input.GetAxisRaw("Mouse ScrollWheel") > 0)
+
+        else if (Input.GetAxisRaw("Mouse ScrollWheel") < 0)
         {
             currentGunIndex--;
-            if(allGuns.Length < 0)
+            if (0 > currentGunIndex)
                 currentGunIndex = allGuns.Length - 1;
 
             SwitchGun();
+            playerUI.SetWeaponSlot(currentGunIndex);
         }
-    }
 
+        // todo : allguns 배열을 데이터로 처리하는 기능이 구현 안됨
+        for (int i = 0; i < allGuns.Length; i++)
+        {
+            if (Input.GetKeyDown((i+1).ToString()))
+            {
+                currentGunIndex = i;
+                SwitchGun();
+                playerUI.SetWeaponSlot(currentGunIndex);
+            }
+        }
+
+    }
 
     private void CoolDownFunction()
     {
         fireCounter -= Time.deltaTime;
+        OverHeatedCoolDown();
+    }
+
+    private void OverHeatedCoolDown()
+    {
+        if (overHeated)
+        {
+            heatCount -= overHeatCoolRate * Time.deltaTime;
+
+            if(heatCount<=0)
+            {
+                heatCount = 0;
+                overHeated = false;
+                playerUI.overheatTextObject.SetActive(false);
+                playerUI.heatText.gameObject.SetActive(false);
+            }
+        }
+        else
+        {
+            heatCount -= coolRate * Time.deltaTime;
+
+            if(heatCount<=0)
+            {
+                heatCount = 0;
+            }
+        }
+        
+        playerUI.currentWeaponSlider.value = heatCount;
+        playerUI.heatText.text = "과열 : " + heatCount.ToString("0.00");
     }
 
     private void InputAttack()
     {
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButtonDown(0) && !isAutomatic && !overHeated)
+        {
+            if (fireCounter <= 0)
+            {
+                Shoot();
+            }
+        }
+        if (Input.GetMouseButton(0) && isAutomatic && !overHeated)
         {
             if (fireCounter <= 0)
             {
@@ -238,12 +295,23 @@ public class PlayerController : MonoBehaviourPunCallbacks
             Destroy(bulletObj, 1f);
         }
         
-        // Debug.Log($"충돌한 오브젝트의 이름 : {hit.collider.gameObject.name}");
-        Debug.Log($"충돌한 오브젝트의 vector3 : {hit.point}");
-        Debug.Log($"충돌한 오브젝트의 거리 : {hit.distance}");
-        Debug.Log($"충돌한 오브젝트의 법선 : {hit.normal}");
-
         fireCounter = fireCoolTime;
+
+        ShootHeatSystem();
+    }
+
+    private void ShootHeatSystem()
+    {
+        heatCount = heatCount + heatPerShot;
+        if (heatCount >= maxHeat)
+        {
+            heatCount = maxHeat;
+            overHeated = true;
+            playerUI.overheatTextObject.SetActive(true);
+
+            playerUI.heatText.gameObject.SetActive(true);
+        }
+
     }
 
     private void SwitchGun()
@@ -264,6 +332,9 @@ public class PlayerController : MonoBehaviourPunCallbacks
         isAutomatic = gun.isAutomatic;
         currentMuzzle = gun.MuzzleFlash.GetComponent<MuzzleFlash>();
 
+        heatPerShot = gun.heatPerShot;
+
+        playerUI.currentWeaponSlider.maxValue = maxHeat;
     }
     #endregion
 
@@ -276,3 +347,4 @@ public class PlayerController : MonoBehaviourPunCallbacks
         Gizmos.DrawLine(cam.transform.position, cam.transform.forward * shootDistance);
     }
 }
+
