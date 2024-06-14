@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 4339546869008292}
   - component: {fileID: 33646179228898998}
   - component: {fileID: 23585435853634366}
+  - component: {fileID: 6529501031892976805}
   m_Layer: 0
   m_Name: SM_Generic_Tree_01
   m_TagString: Untagged
@@ -31,7 +32,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 5717201313788547411}
+  - {fileID: 3359617608587942086}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &33646179228898998
@@ -84,7 +85,28 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!1 &1874471632640273708
+--- !u!65 &6529501031892976805
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1138376770595666}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.48, y: 2.27, z: 0.45}
+  m_Center: {x: 0.059529126, y: 1.11, z: 0.048305392}
+--- !u!1 &552786335160822038
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -92,8 +114,8 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 8842625789164904812}
-  - component: {fileID: 6640994825765744111}
+  - component: {fileID: 1927574306959365541}
+  - component: {fileID: 1663634959730692212}
   m_Layer: 0
   m_Name: Leaf
   m_TagString: Untagged
@@ -101,28 +123,28 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &8842625789164904812
+--- !u!4 &1927574306959365541
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1874471632640273708}
+  m_GameObject: {fileID: 552786335160822038}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0.385, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 5717201313788547411}
+  m_Father: {fileID: 3359617608587942086}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!65 &6640994825765744111
+--- !u!65 &1663634959730692212
 BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1874471632640273708}
+  m_GameObject: {fileID: 552786335160822038}
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -135,9 +157,9 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1.81, y: 1.31, z: 1.32}
-  m_Center: {x: 0.059529126, y: 2.41, z: 0.048305392}
---- !u!1 &4773753067826740528
+  m_Size: {x: 1.68, y: 1.13, z: 1.37}
+  m_Center: {x: 0.059529126, y: 2.11, z: 0.048305392}
+--- !u!1 &5228243016823993752
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -145,7 +167,7 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 5717201313788547411}
+  - component: {fileID: 3359617608587942086}
   m_Layer: 0
   m_Name: Colliders
   m_TagString: Untagged
@@ -153,24 +175,24 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &5717201313788547411
+--- !u!4 &3359617608587942086
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4773753067826740528}
+  m_GameObject: {fileID: 5228243016823993752}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 8021534505350762401}
-  - {fileID: 8842625789164904812}
+  - {fileID: 8442897032241014595}
+  - {fileID: 1927574306959365541}
   m_Father: {fileID: 4339546869008292}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &5411330246063303630
+--- !u!1 &7614168561210121424
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -178,8 +200,8 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 8021534505350762401}
-  - component: {fileID: 85632305634726666}
+  - component: {fileID: 8442897032241014595}
+  - component: {fileID: 9076174949599817462}
   m_Layer: 0
   m_Name: Bark
   m_TagString: Untagged
@@ -187,28 +209,28 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &8021534505350762401
+--- !u!4 &8442897032241014595
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5411330246063303630}
+  m_GameObject: {fileID: 7614168561210121424}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 5717201313788547411}
+  m_Father: {fileID: 3359617608587942086}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!65 &85632305634726666
+--- !u!65 &9076174949599817462
 BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5411330246063303630}
+  m_GameObject: {fileID: 7614168561210121424}
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -221,5 +243,5 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.39, y: 1.98, z: 0.26}
-  m_Center: {x: 0.059529126, y: 0.91, z: 0.048305392}
+  m_Size: {x: 0.48, y: 2.27, z: 0.45}
+  m_Center: {x: 0.059529126, y: 1.11, z: 0.048305392}
